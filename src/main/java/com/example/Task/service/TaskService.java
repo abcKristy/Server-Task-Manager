@@ -5,6 +5,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -25,26 +26,30 @@ public class TaskService {
     }
 
     public Task getTaskById(Long id){
+        log.info("getTaskByIdServer done with id {}",id);
+
         if(!tasksMap.containsKey(id))
             throw new NoSuchElementException("task with id "+ id + " not exist");
 
-        log.info("getTaskById done with id {}",id);
         return tasksMap.get(id);
     }
 
     public List<Task> getAllTasks(){
-        log.info("getAllTasks done");
+        log.info("getAllTasksServer done");
         return new ArrayList<>(tasksMap.values());
     }
 
     public Task createTask(Task taskToCreate) {
+        log.info("createTaskServer done with id {}",idCounter.get());
+
         if(taskToCreate.status()!=null)
             throw new IllegalArgumentException("status should be empty");
-        if(taskToCreate.deadlineDate().isBefore(taskToCreate.createDateTime()))
+        if(taskToCreate.deadlineDate().isBefore(LocalDateTime.now()))
             throw new IllegalArgumentException("deadline must be not before you create time");
 
         var entityToSave = mapper.toEntity(taskToCreate);
         entityToSave.setId(idCounter.getAndIncrement());
+        entityToSave.setCreateDateTime(LocalDateTime.now());
         entityToSave.setStatus(TaskStatus.CREATED);
 
         var savedTask = mapper.toTask(entityToSave);
@@ -55,6 +60,8 @@ public class TaskService {
 
 
     public Task updateTask(Long id, Task taskToUpdate) {
+        log.info("updateTaskServer done with id {}",id);
+
         if(!tasksMap.containsKey(id))
             throw new NoSuchElementException("task with id "+ id + " not exist");
 
@@ -63,20 +70,26 @@ public class TaskService {
         if (taskToUpdate.deadlineDate().isBefore(existingTask.createDateTime())) {
             throw new IllegalArgumentException("Deadline must not be before create date");
         }
+
         var updateEntity = mapper.toEntity(existingTask);
         updateEntity.setCreatorId(taskToUpdate.creatorId());
         updateEntity.setAssignedUserId(taskToUpdate.assignedUserId());
         updateEntity.setStatus(taskToUpdate.status());
         updateEntity.setDeadlineDate(taskToUpdate.deadlineDate());
         updateEntity.setPriority(taskToUpdate.priority());
+
         var updatedTask = mapper.toTask(updateEntity);
         tasksMap.put(updatedTask.id(),updatedTask);
+
         return updatedTask;
     }
 
     public void deleteTask(Long id) {
+        log.info("deleteTaskServer done with id {}",id);
+
         if(!tasksMap.containsKey(id))
             throw new NoSuchElementException("task with id "+ id + " not exist");
+
         tasksMap.remove(id);
     }
 }

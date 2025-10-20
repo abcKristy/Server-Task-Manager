@@ -22,6 +22,10 @@ public class TaskController {
         this.taskService = taskService;
     }
 
+
+
+
+
     @GetMapping("/get/{id}")
     public ResponseEntity<Task> getTaskById(
             @PathVariable Long id
@@ -34,7 +38,7 @@ public class TaskController {
 
     @GetMapping("/getAll")
     public ResponseEntity<List<Task>> getAllTasks(){
-        log.info("done getAllTasksController");
+        log.info("getAllTasksController done");
         return ResponseEntity
                 .status(HttpStatus.OK)
                 .body(taskService.getAllTasks());
@@ -44,7 +48,7 @@ public class TaskController {
     public ResponseEntity<Task> createTask(
             @RequestBody @Valid Task taskToCreate
     ){
-        log.info("createTaskController done");
+        log.info("createTaskController done with userId = {}", taskToCreate.creatorId());
         return ResponseEntity.status(HttpStatus.CREATED).body(taskService.createTask(taskToCreate));
     }
 
@@ -53,7 +57,7 @@ public class TaskController {
             @PathVariable("id") Long id,
             @RequestBody @Valid Task taskToUpdate
     ){
-        log.info("updateTask done");
+        log.info("updateTaskController done with id ={}", id);
         return ResponseEntity
                 .status(HttpStatus.OK)
                 .body(taskService.updateTask(id,taskToUpdate));
@@ -63,7 +67,7 @@ public class TaskController {
     public ResponseEntity<Task> deleteTask(
             @PathVariable("id") Long id
     ){
-        log.info("deleteTask done");
+        log.info("deleteTaskController done with id = {}", id);
         taskService.deleteTask(id);
         return ResponseEntity
                 .status(HttpStatus.OK)

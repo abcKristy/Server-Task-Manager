@@ -14,11 +14,10 @@ public record Task(
         @NotNull
         Long assignedUserId,
         TaskStatus status,
-        @NotNull
-                @FutureOrPresent
+        @Null
         LocalDateTime createDateTime,
         @NotNull
-                @FutureOrPresent
+        @FutureOrPresent
         LocalDateTime deadlineDate,
         @NotNull
         TaskPriority priority
