@@ -7,6 +7,7 @@ import java.time.LocalDateTime;
 
 @Component
 public class TaskEntity {
+
     public Long id;
     public Long creatorId;
     public Long assignedUserId;
