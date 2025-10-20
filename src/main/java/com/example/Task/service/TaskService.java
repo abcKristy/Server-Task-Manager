@@ -27,6 +27,7 @@ public class TaskService {
     public Task getTaskById(Long id){
         if(!tasksMap.containsKey(id))
             throw new NoSuchElementException("task with id "+ id + " not exist");
+
         log.info("getTaskById done with id {}",id);
         return tasksMap.get(id);
     }
@@ -55,7 +56,7 @@ public class TaskService {
 
     public Task updateTask(Long id, Task taskToUpdate) {
         if(!tasksMap.containsKey(id))
-            throw new NoSuchElementException("task with id "+ taskToUpdate.id() + " not exist");
+            throw new NoSuchElementException("task with id "+ id + " not exist");
 
         Task existingTask = tasksMap.get(id);
 
@@ -66,11 +67,16 @@ public class TaskService {
         updateEntity.setCreatorId(taskToUpdate.creatorId());
         updateEntity.setAssignedUserId(taskToUpdate.assignedUserId());
         updateEntity.setStatus(taskToUpdate.status());
-        updateEntity.setCreateDateTime(taskToUpdate.createDateTime());
         updateEntity.setDeadlineDate(taskToUpdate.deadlineDate());
         updateEntity.setPriority(taskToUpdate.priority());
         var updatedTask = mapper.toTask(updateEntity);
         tasksMap.put(updatedTask.id(),updatedTask);
         return updatedTask;
+    }
+
+    public void deleteTask(Long id) {
+        if(!tasksMap.containsKey(id))
+            throw new NoSuchElementException("task with id "+ id + " not exist");
+        tasksMap.remove(id);
     }
 }

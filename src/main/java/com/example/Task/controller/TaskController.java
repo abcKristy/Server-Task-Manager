@@ -1,7 +1,6 @@
 package com.example.Task.controller;
 
 import com.example.Task.Task;
-import com.example.Task.TaskEntity;
 import com.example.Task.service.TaskService;
 import jakarta.validation.Valid;
 import org.slf4j.Logger;
@@ -23,7 +22,7 @@ public class TaskController {
         this.taskService = taskService;
     }
 
-    @GetMapping("/{id}")
+    @GetMapping("/get/{id}")
     public ResponseEntity<Task> getTaskById(
             @PathVariable Long id
     ){
@@ -33,7 +32,7 @@ public class TaskController {
                 .body(taskService.getTaskById(id));
     }
 
-    @GetMapping
+    @GetMapping("/getAll")
     public ResponseEntity<List<Task>> getAllTasks(){
         log.info("done getAllTasksController");
         return ResponseEntity
@@ -41,15 +40,15 @@ public class TaskController {
                 .body(taskService.getAllTasks());
     }
 
-    @PostMapping
+    @PostMapping("/create")
     public ResponseEntity<Task> createTask(
             @RequestBody @Valid Task taskToCreate
     ){
         log.info("createTaskController done");
-        return ResponseEntity.status(HttpStatus.OK).body(taskService.createTask(taskToCreate));
+        return ResponseEntity.status(HttpStatus.CREATED).body(taskService.createTask(taskToCreate));
     }
 
-    @PutMapping("/{id}")
+    @PutMapping("/update/{id}")
     public ResponseEntity<Task> updateTask(
             @PathVariable("id") Long id,
             @RequestBody @Valid Task taskToUpdate
@@ -58,5 +57,16 @@ public class TaskController {
         return ResponseEntity
                 .status(HttpStatus.OK)
                 .body(taskService.updateTask(id,taskToUpdate));
+    }
+
+    @DeleteMapping("/delete/{id}")
+    public ResponseEntity<Task> deleteTask(
+            @PathVariable("id") Long id
+    ){
+        log.info("deleteTask done");
+        taskService.deleteTask(id);
+        return ResponseEntity
+                .status(HttpStatus.OK)
+                .build();
     }
 }
