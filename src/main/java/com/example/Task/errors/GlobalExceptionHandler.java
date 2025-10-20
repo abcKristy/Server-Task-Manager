@@ -36,12 +36,26 @@ public class GlobalExceptionHandler {
         log.error("handle handleNoSuchElementException", e);
 
         var errorDto = new ErrorResponseDto(
-                "Entity not found",
+                "Entity not found, check your id",
                 e.getMessage(),
                 LocalDate.now()
         );
         return ResponseEntity
                 .status(HttpStatus.NOT_FOUND)
+                .body(errorDto);
+    }
+
+    @ExceptionHandler(IllegalArgumentException.class)
+    public ResponseEntity<ErrorResponseDto> handleIllegalArgumentException(IllegalArgumentException e){
+        log.error("handle handleIllegalArgumentException", e);
+
+        var errorDto = new ErrorResponseDto(
+                "Illegal Argument Exception, check your params in body",
+                e.getMessage(),
+                LocalDate.now()
+        );
+        return ResponseEntity
+                .status(HttpStatus.BAD_REQUEST)
                 .body(errorDto);
     }
 }

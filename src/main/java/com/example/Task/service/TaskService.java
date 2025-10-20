@@ -64,9 +64,12 @@ public class TaskService {
 
         if(!tasksMap.containsKey(id))
             throw new NoSuchElementException("task with id "+ id + " not exist");
+        if(taskToUpdate.status()!=null)
+            throw new IllegalArgumentException("status should be  you cannot change it without manager");
 
         Task existingTask = tasksMap.get(id);
-
+        if(existingTask.status().equals(TaskStatus.DONE))
+            throw new IllegalArgumentException("Task has done yes you cannot edit it");
         if (taskToUpdate.deadlineDate().isBefore(existingTask.createDateTime())) {
             throw new IllegalArgumentException("Deadline must not be before create date");
         }
@@ -74,7 +77,6 @@ public class TaskService {
         var updateEntity = mapper.toEntity(existingTask);
         updateEntity.setCreatorId(taskToUpdate.creatorId());
         updateEntity.setAssignedUserId(taskToUpdate.assignedUserId());
-        updateEntity.setStatus(taskToUpdate.status());
         updateEntity.setDeadlineDate(taskToUpdate.deadlineDate());
         updateEntity.setPriority(taskToUpdate.priority());
 
@@ -91,5 +93,22 @@ public class TaskService {
             throw new NoSuchElementException("task with id "+ id + " not exist");
 
         tasksMap.remove(id);
+    }
+
+    public Task updateTaskStatus(Long id, TaskStatus status) {
+        log.info("updateTaskStatusServer done with id {}",id);
+
+        if(!tasksMap.containsKey(id))
+            throw new NoSuchElementException("task with id "+ id + " not exist");
+
+        Task existingTask = tasksMap.get(id);
+
+        var updateEntity = mapper.toEntity(existingTask);
+        updateEntity.setStatus(status);
+        var updatedTask = mapper.toTask(updateEntity);
+
+        tasksMap.put(updatedTask.id(),updatedTask);
+
+        return updatedTask;
     }
 }

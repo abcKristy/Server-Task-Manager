@@ -1,6 +1,7 @@
 package com.example.Task.controller;
 
 import com.example.Task.Task;
+import com.example.Task.TaskStatus;
 import com.example.Task.service.TaskService;
 import jakarta.validation.Valid;
 import org.slf4j.Logger;
@@ -61,6 +62,17 @@ public class TaskController {
         return ResponseEntity
                 .status(HttpStatus.OK)
                 .body(taskService.updateTask(id,taskToUpdate));
+    }
+
+    @PutMapping("update/{id}/status/{status}")
+    public ResponseEntity<Task> updateTaskStatus(
+            @PathVariable("id") Long id,
+            @PathVariable("status")TaskStatus status
+            ){
+        log.info("updateTaskController done with id ={}", id);
+        return ResponseEntity
+                .status(HttpStatus.OK)
+                .body(taskService.updateTaskStatus(id,status));
     }
 
     @DeleteMapping("/delete/{id}")
