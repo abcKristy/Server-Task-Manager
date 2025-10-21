@@ -14,6 +14,7 @@ import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.NoSuchElementException;
 
 @Service
 public class TaskService {
@@ -89,10 +90,8 @@ public class TaskService {
     public void deleteTask(Long id) {
         log.info("deleteTaskServer done with id {}",id);
 
-        TaskEntity updateEntity = repository.findById(id)
-                .orElseThrow(() -> new EntityNotFoundException(
-                        "Not found task by id = "+id
-                ));
+        if (repository.findById(id).isEmpty())
+            throw new NoSuchElementException("Not found reservation by id");
 
         repository.deleteById(id);
     }
