@@ -1,5 +1,7 @@
-package com.example.Task;
+package com.example.Task.enums;
 
+import com.example.Task.entities.Task;
+import com.example.Task.entities.TaskEntity;
 import org.springframework.stereotype.Component;
 
 @Component

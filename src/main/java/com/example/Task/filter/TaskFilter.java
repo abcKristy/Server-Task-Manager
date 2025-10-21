@@ -1,4 +1,4 @@
-package com.example.Task;
+package com.example.Task.filter;
 
 import com.example.Task.enums.TaskPriority;
 import com.example.Task.enums.TaskStatus;

@@ -1,4 +1,4 @@
-package com.example.Task;
+package com.example.Task.entities;
 
 
 import com.example.Task.enums.TaskPriority;

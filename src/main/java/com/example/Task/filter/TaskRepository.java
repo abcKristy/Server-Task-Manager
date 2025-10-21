@@ -1,5 +1,6 @@
-package com.example.Task;
+package com.example.Task.filter;
 
+import com.example.Task.entities.TaskEntity;
 import com.example.Task.enums.TaskPriority;
 import com.example.Task.enums.TaskStatus;
 import org.springframework.data.domain.Pageable;

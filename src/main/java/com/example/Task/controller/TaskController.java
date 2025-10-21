@@ -1,7 +1,7 @@
 package com.example.Task.controller;
 
-import com.example.Task.Task;
-import com.example.Task.TaskFilter;
+import com.example.Task.entities.Task;
+import com.example.Task.filter.TaskFilter;
 import com.example.Task.enums.TaskPriority;
 import com.example.Task.enums.TaskStatus;
 import com.example.Task.service.TaskService;

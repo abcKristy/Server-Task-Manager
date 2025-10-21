@@ -1,7 +1,11 @@
 package com.example.Task.service;
 
-import com.example.Task.*;
+import com.example.Task.entities.Task;
+import com.example.Task.entities.TaskEntity;
+import com.example.Task.enums.TaskMapper;
 import com.example.Task.enums.TaskStatus;
+import com.example.Task.filter.TaskFilter;
+import com.example.Task.filter.TaskRepository;
 import jakarta.persistence.EntityNotFoundException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
