@@ -1,13 +1,12 @@
 package com.example.Task.service;
 
 import com.example.Task.*;
+import jakarta.persistence.EntityNotFoundException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.concurrent.atomic.AtomicLong;
@@ -15,32 +14,34 @@ import java.util.concurrent.atomic.AtomicLong;
 @Service
 public class TaskService {
     private static final Logger log = LoggerFactory.getLogger(TaskService.class);
-    private final HashMap<Long, Task> tasksMap;
+    private final TaskRepository repository;
     private final TaskMapper mapper;
-    private final AtomicLong idCounter;
 
-    public TaskService(TaskMapper mapper) {
-        this.tasksMap = new HashMap<>();
+    public TaskService(TaskRepository repository, TaskMapper mapper) {
+        this.repository = repository;
         this.mapper = mapper;
-        this.idCounter = new AtomicLong();
     }
 
     public Task getTaskById(Long id){
         log.info("getTaskByIdServer done with id {}",id);
 
-        if(!tasksMap.containsKey(id))
-            throw new NoSuchElementException("task with id "+ id + " not exist");
+        TaskEntity taskEntity = repository.findById(id)
+                .orElseThrow(() -> new EntityNotFoundException(
+                        "Not found task by id = "+id
+                ));
 
-        return tasksMap.get(id);
+        return mapper.toTask(taskEntity);
     }
 
     public List<Task> getAllTasks(){
         log.info("getAllTasksServer done");
-        return new ArrayList<>(tasksMap.values());
+        List<TaskEntity> allEntities = repository.findAll();
+        return allEntities.stream().map
+                (mapper::toTask).toList();
     }
 
     public Task createTask(Task taskToCreate) {
-        log.info("createTaskServer done with id {}",idCounter.get());
+        log.info("createTaskServer done");
 
         if(taskToCreate.status()!=null)
             throw new IllegalArgumentException("status should be empty");
@@ -48,67 +49,60 @@ public class TaskService {
             throw new IllegalArgumentException("deadline must be not before you create time");
 
         var entityToSave = mapper.toEntity(taskToCreate);
-        entityToSave.setId(idCounter.getAndIncrement());
         entityToSave.setCreateDateTime(LocalDateTime.now());
         entityToSave.setStatus(TaskStatus.CREATED);
 
-        var savedTask = mapper.toTask(entityToSave);
-        tasksMap.put(savedTask.id(), savedTask);
+        repository.save(entityToSave);
 
-        return savedTask;
+        return mapper.toTask(entityToSave);
     }
 
 
     public Task updateTask(Long id, Task taskToUpdate) {
         log.info("updateTaskServer done with id {}",id);
 
-        if(!tasksMap.containsKey(id))
-            throw new NoSuchElementException("task with id "+ id + " not exist");
+        TaskEntity updateEntity = repository.findById(id)
+                .orElseThrow(() -> new EntityNotFoundException(
+                        "Not found task by id = "+id
+                ));
         if(taskToUpdate.status()!=null)
             throw new IllegalArgumentException("status should be  you cannot change it without manager");
-
-        Task existingTask = tasksMap.get(id);
-        if(existingTask.status().equals(TaskStatus.DONE))
+        if(updateEntity.getStatus().equals(TaskStatus.DONE))
             throw new IllegalArgumentException("Task has done yes you cannot edit it");
-        if (taskToUpdate.deadlineDate().isBefore(existingTask.createDateTime())) {
+        if (taskToUpdate.deadlineDate().isBefore(updateEntity.getCreateDateTime())) {
             throw new IllegalArgumentException("Deadline must not be before create date");
         }
 
-        var updateEntity = mapper.toEntity(existingTask);
         updateEntity.setCreatorId(taskToUpdate.creatorId());
         updateEntity.setAssignedUserId(taskToUpdate.assignedUserId());
         updateEntity.setDeadlineDate(taskToUpdate.deadlineDate());
         updateEntity.setPriority(taskToUpdate.priority());
+        repository.save(updateEntity);
 
-        var updatedTask = mapper.toTask(updateEntity);
-        tasksMap.put(updatedTask.id(),updatedTask);
-
-        return updatedTask;
+        return mapper.toTask(updateEntity);
     }
 
     public void deleteTask(Long id) {
         log.info("deleteTaskServer done with id {}",id);
 
-        if(!tasksMap.containsKey(id))
-            throw new NoSuchElementException("task with id "+ id + " not exist");
+        TaskEntity updateEntity = repository.findById(id)
+                .orElseThrow(() -> new EntityNotFoundException(
+                        "Not found task by id = "+id
+                ));
 
-        tasksMap.remove(id);
+        repository.deleteById(id);
     }
 
     public Task updateTaskStatus(Long id, TaskStatus status) {
         log.info("updateTaskStatusServer done with id {}",id);
 
-        if(!tasksMap.containsKey(id))
-            throw new NoSuchElementException("task with id "+ id + " not exist");
+        TaskEntity updateEntity = repository.findById(id)
+                .orElseThrow(() -> new EntityNotFoundException(
+                        "Not found reservation by id = "+id
+                ));
 
-        Task existingTask = tasksMap.get(id);
-
-        var updateEntity = mapper.toEntity(existingTask);
         updateEntity.setStatus(status);
-        var updatedTask = mapper.toTask(updateEntity);
-
-        tasksMap.put(updatedTask.id(),updatedTask);
-
-        return updatedTask;
+        repository.save(updateEntity);
+        return mapper.toTask(updateEntity);
     }
 }

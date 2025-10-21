@@ -1,19 +1,32 @@
 package com.example.Task;
 
 
+import jakarta.persistence.*;
+import org.springframework.boot.autoconfigure.domain.EntityScan;
 import org.springframework.stereotype.Component;
 
 import java.time.LocalDateTime;
 
-@Component
+@Entity
+@Table(name = "TaskManager")
 public class TaskEntity {
-
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name ="id")
     public Long id;
+    @Column(name ="creator_ud")
     public Long creatorId;
+    @Column(name ="assigned_user_id")
     public Long assignedUserId;
+    @Enumerated(EnumType.STRING)
+    @Column(name ="status")
     public TaskStatus status;
+    @Column(name ="create_date_time")
     public LocalDateTime createDateTime;
+    @Column(name ="deadline_date")
     public LocalDateTime deadlineDate;
+    @Enumerated(EnumType.STRING)
+    @Column(name ="priority")
     public TaskPriority priority;
 
     public TaskEntity() {

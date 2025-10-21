@@ -76,7 +76,7 @@ public class TaskController {
     }
 
     @DeleteMapping("/delete/{id}")
-    public ResponseEntity<Task> deleteTask(
+    public ResponseEntity<Void> deleteTask(
             @PathVariable("id") Long id
     ){
         log.info("deleteTaskController done with id = {}", id);
