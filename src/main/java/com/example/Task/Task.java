@@ -11,7 +11,9 @@ public record Task(
         Long id,
         @NotNull
         Long creatorId,
+        @NotNull
         Long assignedUserId,
+        @Null
         TaskStatus status,
         @Null
         LocalDateTime createDateTime,
@@ -19,6 +21,8 @@ public record Task(
         @FutureOrPresent
         LocalDateTime deadlineDate,
         @NotNull
-        TaskPriority priority
+        TaskPriority priority,
+        @Null
+        LocalDateTime doneDateTime
 ) {
 }

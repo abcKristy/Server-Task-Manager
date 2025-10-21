@@ -2,8 +2,6 @@ package com.example.Task;
 
 
 import jakarta.persistence.*;
-import org.springframework.boot.autoconfigure.domain.EntityScan;
-import org.springframework.stereotype.Component;
 
 import java.time.LocalDateTime;
 
@@ -28,6 +26,8 @@ public class TaskEntity {
     @Enumerated(EnumType.STRING)
     @Column(name ="priority")
     public TaskPriority priority;
+    @Column(name ="done_date_time")
+    public LocalDateTime doneDateTime;
 
     public TaskEntity() {
     }
@@ -38,7 +38,8 @@ public class TaskEntity {
                       TaskStatus status,
                       LocalDateTime createDateTime,
                       LocalDateTime deadlineDate,
-                      TaskPriority priority) {
+                      TaskPriority priority,
+                      LocalDateTime doneDateTime) {
         this.id = id;
         this.creatorId = creatorId;
         this.assignedUserId = assignedUserId;
@@ -46,6 +47,15 @@ public class TaskEntity {
         this.createDateTime = createDateTime;
         this.deadlineDate = deadlineDate;
         this.priority = priority;
+        this.doneDateTime = doneDateTime;
+    }
+
+    public LocalDateTime getDoneDateTime() {
+        return doneDateTime;
+    }
+
+    public void setDoneDateTime(LocalDateTime doneDateTime) {
+        this.doneDateTime = doneDateTime;
     }
 
     public Long getId() {

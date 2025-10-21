@@ -5,6 +5,7 @@ import jakarta.persistence.EntityNotFoundException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
+import org.springframework.web.ErrorResponseException;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -67,7 +68,7 @@ public class TaskService {
                 ));
         if(taskToUpdate.status()!=null)
             throw new IllegalArgumentException("status should be  you cannot change it without manager");
-        if(updateEntity.getStatus().equals(TaskStatus.DONE))
+        if(updateEntity.getStatus().equals(TaskStatus.DONE_IN_TIME) || updateEntity.getStatus().equals(TaskStatus.DONE_AFTER_DEADLINE))
             throw new IllegalArgumentException("Task has done yes you cannot edit it");
         if (taskToUpdate.deadlineDate().isBefore(updateEntity.getCreateDateTime())) {
             throw new IllegalArgumentException("Deadline must not be before create date");
@@ -100,8 +101,13 @@ public class TaskService {
                 .orElseThrow(() -> new EntityNotFoundException(
                         "Not found reservation by id = "+id
                 ));
+        if((updateEntity.getStatus()==TaskStatus.DONE_AFTER_DEADLINE)||(updateEntity.getStatus()==TaskStatus.DONE_IN_TIME))
+            throw new IllegalArgumentException("Task has already finished");
 
-        updateEntity.setStatus(TaskStatus.DONE);
+        updateEntity.setDoneDateTime(LocalDateTime.now());
+        if(updateEntity.getDeadlineDate().isAfter(updateEntity.getDoneDateTime()))
+            updateEntity.setStatus(TaskStatus.DONE_IN_TIME);
+        else updateEntity.setStatus(TaskStatus.DONE_AFTER_DEADLINE);
         repository.save(updateEntity);
         return mapper.toTask(updateEntity);
     }
@@ -112,12 +118,10 @@ public class TaskService {
         TaskEntity taskEntity = repository.findById(id)
                 .orElseThrow(() -> new EntityNotFoundException("Not found task by id = " + id));
 
-        // Проверка, что assignedUserId заполнен
-        if (taskEntity.getAssignedUserId() == null) {
-            throw new IllegalArgumentException("Task must have an assigned user to start");
+        if (taskEntity.getStatus() != TaskStatus.CREATED) {
+            throw new IllegalArgumentException("Task has already started or even finished");
         }
 
-        // Проверка ограничения активных задач (не более 4 IN_PROGRESS + текущая = 5)
         long activeTasksCount = repository.countByAssignedUserIdAndStatus(
                 taskEntity.getAssignedUserId(), TaskStatus.IN_PROGRESS);
 
