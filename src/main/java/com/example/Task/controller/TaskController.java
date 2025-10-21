@@ -64,15 +64,25 @@ public class TaskController {
                 .body(taskService.updateTask(id,taskToUpdate));
     }
 
-    @PutMapping("update/{id}/status/{status}")
-    public ResponseEntity<Task> updateTaskStatus(
-            @PathVariable("id") Long id,
-            @PathVariable("status")TaskStatus status
+    @PutMapping("update/{id}/start")
+    public ResponseEntity<Task> updateTaskStatusInProgress(
+            @PathVariable("id") Long id
             ){
         log.info("updateTaskController done with id ={}", id);
         return ResponseEntity
                 .status(HttpStatus.OK)
-                .body(taskService.updateTaskStatus(id,status));
+                .body(taskService.updateTaskStatus(id,TaskStatus.IN_PROGRESS));
+    }
+
+    @PutMapping("update/{id}/finish")
+    public ResponseEntity<Task> updateTaskStatusDone(
+            @PathVariable("id") Long id,
+            @PathVariable("status")TaskStatus status
+    ){
+        log.info("updateTaskController done with id ={}", id);
+        return ResponseEntity
+                .status(HttpStatus.OK)
+                .body(taskService.updateTaskStatus(id,TaskStatus.DONE));
     }
 
     @DeleteMapping("/delete/{id}")
