@@ -1,7 +1,9 @@
 package com.example.Task.controller;
 
 import com.example.Task.Task;
-import com.example.Task.TaskStatus;
+import com.example.Task.TaskFilter;
+import com.example.Task.enums.TaskPriority;
+import com.example.Task.enums.TaskStatus;
 import com.example.Task.service.TaskService;
 import jakarta.validation.Valid;
 import org.slf4j.Logger;
@@ -38,11 +40,28 @@ public class TaskController {
     }
 
     @GetMapping("/getAll")
-    public ResponseEntity<List<Task>> getAllTasks(){
+    public ResponseEntity<List<Task>> getAllTasks(
+            @RequestParam(name = "creator_id", required = false) Long creatorId,
+            @RequestParam(name = "assigned_user_id", required = false) Long assignedUserId,
+            @RequestParam(name = "status", required = false) TaskStatus status,
+            @RequestParam(name = "priority", required = false) TaskPriority priority,
+            @RequestParam(name = "priority", required = false) Integer pageSize,
+            @RequestParam(name = "priority", required = false) Integer pageNumber
+    ){
         log.info("getAllTasksController done");
+
+        var filter = new TaskFilter(
+                creatorId,
+                assignedUserId,
+                status,
+                priority,
+                pageSize,
+                pageNumber
+        );
+
         return ResponseEntity
                 .status(HttpStatus.OK)
-                .body(taskService.getAllTasks());
+                .body(taskService.searchAllByFilter(filter));
     }
 
     @PostMapping("/create")

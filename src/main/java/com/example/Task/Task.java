@@ -1,5 +1,7 @@
 package com.example.Task;
 
+import com.example.Task.enums.TaskPriority;
+import com.example.Task.enums.TaskStatus;
 import jakarta.validation.constraints.FutureOrPresent;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Null;

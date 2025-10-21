@@ -1,16 +1,15 @@
 package com.example.Task.service;
 
 import com.example.Task.*;
+import com.example.Task.enums.TaskStatus;
 import jakarta.persistence.EntityNotFoundException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
-import org.springframework.web.ErrorResponseException;
 
 import java.time.LocalDateTime;
 import java.util.List;
-import java.util.NoSuchElementException;
-import java.util.concurrent.atomic.AtomicLong;
 
 @Service
 public class TaskService {
@@ -136,5 +135,24 @@ public class TaskService {
         taskEntity.setStatus(TaskStatus.IN_PROGRESS);
         var savedEntity = repository.save(taskEntity);
         return mapper.toTask(savedEntity);
+    }
+
+    public List<Task> searchAllByFilter(TaskFilter filter) {
+        int pageSize = filter.pageSize() != null
+                ? filter.pageSize() : 10;
+        int pageNumber = filter.pageNumber() != null
+                ? filter.pageNumber() : 0;
+        var pageable = Pageable
+                .ofSize(pageSize)
+                .withPage(pageNumber);
+
+        List<TaskEntity> allEntities = repository.searchAllByFilter(
+                filter.assignedUserId(),
+                filter.creatorId(),
+                filter.status(),
+                filter.priority(),
+                pageable
+        );
+        return allEntities.stream().map(mapper::toTask).toList();
     }
 }

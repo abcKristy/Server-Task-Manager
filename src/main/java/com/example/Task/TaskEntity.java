@@ -1,6 +1,8 @@
 package com.example.Task;
 
 
+import com.example.Task.enums.TaskPriority;
+import com.example.Task.enums.TaskStatus;
 import jakarta.persistence.*;
 
 import java.time.LocalDateTime;
@@ -12,7 +14,7 @@ public class TaskEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name ="id")
     public Long id;
-    @Column(name ="creator_ud")
+    @Column(name ="creator_id")
     public Long creatorId;
     @Column(name ="assigned_user_id")
     public Long assignedUserId;
