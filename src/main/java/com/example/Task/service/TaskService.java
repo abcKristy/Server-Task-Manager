@@ -93,7 +93,7 @@ public class TaskService {
         repository.deleteById(id);
     }
 
-    public Task updateTaskStatus(Long id, TaskStatus status) {
+    public Task updateTaskStatusDone(Long id) {
         log.info("updateTaskStatusServer done with id {}",id);
 
         TaskEntity updateEntity = repository.findById(id)
@@ -101,8 +101,36 @@ public class TaskService {
                         "Not found reservation by id = "+id
                 ));
 
-        updateEntity.setStatus(status);
+        updateEntity.setStatus(TaskStatus.DONE);
         repository.save(updateEntity);
         return mapper.toTask(updateEntity);
+    }
+
+    public Task updateTaskStatusStart(Long id) {
+        log.info("startTaskServer done with id {}", id);
+
+        TaskEntity taskEntity = repository.findById(id)
+                .orElseThrow(() -> new EntityNotFoundException("Not found task by id = " + id));
+
+        // Проверка, что assignedUserId заполнен
+        if (taskEntity.getAssignedUserId() == null) {
+            throw new IllegalArgumentException("Task must have an assigned user to start");
+        }
+
+        // Проверка ограничения активных задач (не более 4 IN_PROGRESS + текущая = 5)
+        long activeTasksCount = repository.countByAssignedUserIdAndStatus(
+                taskEntity.getAssignedUserId(), TaskStatus.IN_PROGRESS);
+
+        if (activeTasksCount >= 5) {
+            throw new IllegalArgumentException(
+                    "User " + taskEntity.getAssignedUserId() +
+                            " already has " + activeTasksCount +
+                            " active tasks. Maximum allowed is 5."
+            );
+        }
+
+        taskEntity.setStatus(TaskStatus.IN_PROGRESS);
+        var savedEntity = repository.save(taskEntity);
+        return mapper.toTask(savedEntity);
     }
 }

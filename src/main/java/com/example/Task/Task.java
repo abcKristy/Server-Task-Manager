@@ -11,7 +11,6 @@ public record Task(
         Long id,
         @NotNull
         Long creatorId,
-        @NotNull
         Long assignedUserId,
         TaskStatus status,
         @Null
